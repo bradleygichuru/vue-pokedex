@@ -1,7 +1,9 @@
 # tevvo-build-intern-challenge
 
-This template should help get you started developing with Vue 3 in Vite.
-
+Using pokeapi.
+[Live demo link](https://astonishing-pavlova-765ff2.netlify.app/)
+# Auth implementation
+ Firebase authentication used for auth
 ## Recommended IDE Setup
 
 [VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
@@ -19,7 +21,6 @@ See [Vite Configuration Reference](https://vite.dev/config/).
 ```sh
 pnpm install
 ```
-
 ### Compile and Hot-Reload for Development
 
 ```sh
@@ -37,9 +38,12 @@ pnpm build
 ```sh
 pnpm test:unit
 ```
+![Alt text](./Screenshot_2025-06-12_14-48-47.png "a title")
+
 
 ### Lint with [ESLint](https://eslint.org/)
 
 ```sh
 pnpm lint
 ```
+
