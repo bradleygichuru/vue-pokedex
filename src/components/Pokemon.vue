@@ -1,9 +1,13 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { auth } from '../../firebase-conf'
+import { onAuthStateChanged, signOut } from 'firebase/auth'
 const router = useRouter()
 const route = useRoute()
 console.log({ name: route.params.name })
+
+const isLoggedIn = ref(false)
 const loadingDetail = ref(false)
 onMounted(async () => {
   await fetchPokemonDetail(route.params.name)
@@ -22,30 +26,22 @@ const fetchPokemonDetail = async (name) => {
     loadingDetail.value = false
   }
 }
+const handleSignOut = () => {
+  signOut(auth).then(() => { router.push("/login") })
 
-const getTypeColor = (type) => {
-  const colors = {
-    normal: 'bg-gray-400',
-    fire: 'bg-red-500',
-    water: 'bg-blue-500',
-    electric: 'bg-yellow-400',
-    grass: 'bg-green-500',
-    ice: 'bg-blue-300',
-    fighting: 'bg-red-700',
-    poison: 'bg-purple-500',
-    ground: 'bg-yellow-600',
-    flying: 'bg-indigo-400',
-    psychic: 'bg-pink-500',
-    bug: 'bg-green-400',
-    rock: 'bg-yellow-800',
-    ghost: 'bg-purple-700',
-    dragon: 'bg-indigo-700',
-    dark: 'bg-gray-800',
-    steel: 'bg-gray-500',
-    fairy: 'bg-pink-300'
-  }
-  return colors[type] || 'bg-gray-400'
 }
+onAuthStateChanged(auth, (user) => {
+  if (!user) {
+    isLoggedIn.value = false
+    console.log("not logged in")
+    router.push("/login")
+  } else {
+    isLoggedIn.value = true
+    console.log("logged in")
+  }
+})
+
+
 
 
 </script>
@@ -57,10 +53,11 @@ const getTypeColor = (type) => {
           <h1 class="text-2xl font-bold cursor-pointer" @click="router.push('/')">
             Pokemon Explorer
           </h1>
-          <button v-if="currentView !== 'list'" @click="router.push('/')"
-            class="bg-blue-500 hover:bg-blue-700 px-4 py-2 rounded transition-colors">
+          <button @click="router.push('/')" class="bg-blue-500 hover:bg-blue-700 px-4 py-2 rounded transition-colors">
             Back to List
           </button>
+          <button class="bg-blue-500 hover:bg-blue-700 px-4 py-2 rounded transition-colors" v-if="isLoggedIn"
+            type="button" @click="handleSignOut()">Logout</button>
         </nav>
       </div>
     </header>

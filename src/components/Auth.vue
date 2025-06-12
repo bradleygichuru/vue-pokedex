@@ -38,6 +38,8 @@ const handleSubmit = () => {
     loading.value = true
     createUserWithEmailAndPassword(auth, form.email, form.password).then((userCred) => {
 
+      showSuccess.value = true
+      successMessage.value = "Account created sucessfully.Sign in"
       setSignin()
     }).catch((e) => {
       console.error(e)

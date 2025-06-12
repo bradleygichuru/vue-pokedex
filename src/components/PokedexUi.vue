@@ -1,5 +1,5 @@
 <script setup>
-import { onAuthStateChanged } from 'firebase/auth'
+import { onAuthStateChanged, signOut } from 'firebase/auth'
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { auth } from '../../firebase-conf'
@@ -11,16 +11,24 @@ const loading = ref(false)
 const itemsPerPage = 10
 const searchTerm = ref('')
 const allPokemon = ref([])
-const searchTimeout = ref(null)
+const isLoggedIn = ref(false)
 const isSearchActive = computed(() => {
   return searchTerm.value.trim().length > 0
 })
 
+const handleSignOut = () => {
+  signOut(auth).then(() => {
+    router.push("/login")
+  })
+
+}
 onAuthStateChanged(auth, (user) => {
   if (!user) {
+    isLoggedIn.value = false
     console.log("not logged in")
     router.push("/login")
   } else {
+    isLoggedIn.value = true
     console.log("logged in")
   }
 })
@@ -71,17 +79,9 @@ const fetchAllPokemon = async () => {
   }
 }
 const handleSearch = () => {
-  // Debounce search input
-  if (searchTimeout.value) {
-    clearTimeout(searchTimeout.value)
+  if (isSearchActive.value) {
+    currentPage.value = 1
   }
-
-  searchTimeout.value = setTimeout(() => {
-    // Reset to first page when searching
-    if (isSearchActive.value) {
-      currentPage.value = 1
-    }
-  }, 300)
 }
 watch(searchTerm, () => {
   handleSearch()
@@ -138,9 +138,8 @@ onMounted(async () => {
           <h1 class="text-2xl font-bold cursor-pointer">
             Pokemon Explorer
           </h1>
-          <button class=" px-4 py-2 rounded">
-            Back to List
-          </button>
+          <button class="bg-blue-500 hover:bg-blue-700 px-4 py-2 rounded transition-colors" v-if="isLoggedIn"
+            type="button" @click="handleSignOut()">Logout</button>
         </nav>
       </div>
 
