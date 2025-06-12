@@ -14,23 +14,40 @@ const router = useRouter()
 const setSignup = () => { signIn.value = false }
 
 const setSignin = () => { signIn.value = true }
+console.log({ signin: signIn.value })
 const handleSubmit = () => {
-  if (signIn) {
-    createUserWithEmailAndPassword(auth, form.email, form.password).then((userCred) => {
+  if (signIn.value) {
+    console.log("signing in")
+    loading.value = true
+    signInWithEmailAndPassword(auth, form.email, form.password).then((user) => {
 
-      signIn.value = true
+      router.push("/")
     }).catch((e) => {
 
-      errorMessage.value = "Error signing up"
+      console.error(e)
+      errorMessage.value = "Error signing in"
+    }).finally(() => {
+
+      loading.value = false
     })
 
 
   } else {
-    signInWithEmailAndPassword(auth, form.email, form.password).then((user) => {
-      router.push("/")
+
+    console.log("signing up")
+    loading.value = true
+    createUserWithEmailAndPassword(auth, form.email, form.password).then((userCred) => {
+
+      setSignin()
     }).catch((e) => {
-      errorMessage.value = "Error signing in"
+      console.error(e)
+      errorMessage.value = "Error signing up"
+    }).finally(() => {
+
+
+      loading.value = false
     })
+
   }
 
 }
@@ -44,7 +61,7 @@ const handleSubmit = () => {
         </h2>
 
         <h2 v-if="!signIn" class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          Sign up to your account
+          Sign up
         </h2>
         <p v-if="signIn" class="mt-2 text-center text-sm text-gray-600">
           Welcome back! Please enter your details
@@ -56,7 +73,6 @@ const handleSubmit = () => {
       </div>
 
       <form class="mt-8 space-y-6" @submit.prevent="handleSubmit">
-        <!-- Error Message -->
         <div v-if="errorMessage" class="p-4 bg-red-50 border border-red-200 rounded-md">
           <div class="flex">
             <div class="flex-shrink-0">
@@ -66,6 +82,11 @@ const handleSubmit = () => {
                   d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
                   clip-rule="evenodd" />
               </svg>
+            </div>
+            <div class="ml-3">
+              <p class="text-sm font-medium text-red-800">
+                {{ errorMessage }}
+              </p>
             </div>
           </div>
         </div>
@@ -111,7 +132,7 @@ const handleSubmit = () => {
 
 
         <div>
-          <button type="submit" :disabled="loading"
+          <button v-if="signIn" type="submit" :disabled="loading"
             class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200">
             <span v-if="loading" class="absolute left-0 inset-y-0 flex items-center pl-3">
               <svg class="animate-spin h-5 w-5 text-blue-300" xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -124,6 +145,20 @@ const handleSubmit = () => {
             </span>
             {{ loading ? 'Signing in...' : 'Sign in' }}
           </button>
+          <button v-else type="submit" :disabled="loading"
+            class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200">
+            <span v-if="loading" class="absolute left-0 inset-y-0 flex items-center pl-3">
+              <svg class="animate-spin h-5 w-5 text-blue-300" xmlns="http://www.w3.org/2000/svg" fill="none"
+                viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                </path>
+              </svg>
+            </span>
+            {{ loading ? 'Signing up...' : 'Sign up' }}
+          </button>
+
         </div>
 
         <div v-if="signIn" class="text-center">
@@ -136,6 +171,8 @@ const handleSubmit = () => {
         </div>
         <div v-else class="text-center">
           <p class="text-sm text-gray-600">
+
+            Already have an account?
             <button @click="setSignin()" href="#" class="font-medium text-blue-600 hover:text-blue-500 underline">
               Sign in
             </button>
@@ -145,7 +182,6 @@ const handleSubmit = () => {
       </form>
 
 
-      <!-- Success Message -->
       <div v-if="showSuccess" class="mt-4 p-4 bg-green-50 border border-green-200 rounded-md">
         <div class="flex">
           <div class="flex-shrink-0">

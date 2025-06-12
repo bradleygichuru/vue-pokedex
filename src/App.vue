@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import { RouterLink, RouterView, useRoute } from 'vue-router'
-const route = useRoute()
-//console.log(route.params)
+import { RouterView } from 'vue-router'
 </script>
 
 <template>

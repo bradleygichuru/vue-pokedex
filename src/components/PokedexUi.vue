@@ -72,15 +72,24 @@
 </template>
 
 <script setup>
+import { onAuthStateChanged } from 'firebase/auth'
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { auth } from '../../firebase-conf'
 const router = useRouter()
 const pokemonList = ref([])
 const currentPage = ref(1)
 const totalPokemon = ref(0)
 const loading = ref(false)
 const itemsPerPage = 10
-
+onAuthStateChanged(auth, (user) => {
+  if (!user) {
+    console.log("not logged in")
+    router.push("/login")
+  } else {
+    console.log("logged in")
+  }
+})
 const totalPages = computed(() => {
   return Math.ceil(totalPokemon.value / itemsPerPage)
 })
